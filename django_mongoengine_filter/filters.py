@@ -144,7 +144,6 @@ class Filter(object):
             # if settings.DISABLE_HELP_TEXT:
             #     field_kwargs.pop('help_text', None)
 
-            self._field = self.field_class(label=self.label, **field_kwargs)
         return self._field
 
     def filter(self, qs, value):

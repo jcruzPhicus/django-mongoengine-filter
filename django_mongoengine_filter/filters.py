@@ -59,13 +59,51 @@ class Filter(object):
             self.filter = action
         self.lookup_type = lookup_type
         self.widget = widget
-        self.required = required
         self.extra = kwargs
+        self.extra.setdefault('required', False)
         self.distinct = distinct
         self.exclude = exclude
 
         self.creation_counter = Filter.creation_counter
         Filter.creation_counter += 1
+
+    # FIXME: original field property
+    # there had been more logic to check lookup types
+    # django-filters has renamed lookup_type to lookup_expr
+    # yet in my case using that smaller `field` property from below works as a glance
+    #
+    # @property
+    # def field(self):
+    #     if not hasattr(self, "_field"):
+    #         help_text = _("This is an exclusion filter") if self.exclude else ""
+    #         if self.lookup_type is None or isinstance(
+    #             self.lookup_type, (list, tuple)
+    #         ):
+    #             if self.lookup_type is None:
+    #                 lookup = [(x, x) for x in LOOKUP_TYPES]
+    #             else:
+    #                 lookup = [
+    #                     (x, x) for x in LOOKUP_TYPES if x in self.lookup_type
+    #                 ]
+    #             self._field = LookupTypeField(
+    #                 self.field_class(
+    #                     required=self.required, widget=self.widget, **self.extra
+    #                 ),
+    #                 lookup,
+    #                 required=self.required,
+    #                 label=self.label,
+    #                 help_text=help_text,
+    #             )
+    #         else:
+    #             self._field = self.field_class(
+    #                 required=self.required,
+    #                 label=self.label,
+    #                 widget=self.widget,
+    #                 help_text=help_text,
+    #                 **self.extra
+    #             )
+
+    #     return self._field
 
     @property
     def field(self):
@@ -101,6 +139,10 @@ class Filter(object):
                     help_text=help_text,
                     **self.extra,
                 )
+
+            # TODO: not available in django_mongoengine_filter
+            # if settings.DISABLE_HELP_TEXT:
+            #     field_kwargs.pop('help_text', None)
 
         return self._field
 
@@ -187,7 +229,7 @@ class RangeFilter(Filter):
         return qs
 
 
-_truncate = lambda dt: dt.replace(hour=0, minute=0, second=0)  # noqa
+def _truncate(dt): return dt.replace(hour=0, minute=0, second=0)  # noqa
 
 
 class DateRangeFilter(ChoiceFilter):

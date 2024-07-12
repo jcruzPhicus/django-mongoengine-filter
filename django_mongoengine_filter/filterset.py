@@ -202,6 +202,7 @@ class BaseFilterSet:
         self.queryset = queryset
         self.request = request
         self.form_prefix = prefix
+        self.request = request
         if strict is not None:
             self.strict = strict
 
@@ -226,6 +227,9 @@ class BaseFilterSet:
         return self.qs[key]
 
     def is_valid(self):
+        """
+        Return True if the underlying form has no errors, or False otherwise.
+        """
         return self.is_bound and self.form.is_valid()
 
     @property
